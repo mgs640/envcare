@@ -1,0 +1,26 @@
+{
+    "scripts": {
+        "check-env-cmd": [
+            "Diarmuidie\\EnvPopulate\\ScriptHandler::populateEnv"
+        ]
+    },
+    "extra": {
+        "env-populate": {
+            "files": [
+                {
+                    "example-file": ".env.dist",
+                    "generated-file": ".env"
+                }
+            ]
+        }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/mgs640/EnvPopulate"
+        }
+    ],
+    "require": {
+        "diarmuidie/envpopulate": "^1.2"
+    }
+}

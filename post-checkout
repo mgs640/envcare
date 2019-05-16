@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Find script path
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+
+script_path="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+current_path=$PWD
+
+oldrev=$1
+
+if [ "$oldrev" = 0000000000000000000000000000000000000000 ]
+then
+	oldrev=""
+fi
+
+changed_files="$(git diff-tree -r --name-only --no-commit-id $oldrev $2)"
+
+updates_watcher() {
+	echo "$changed_files" | grep -E --quiet "$1" && gnome-terminal --window --wait -- sh -c "ls; $2"
+}
+
+# Update `.env` if the `.env.dist` file gets changed
+composer_cmd="cd $script_path && composer run-script check-env-cmd example-file='$current_path/.env.dist' generated-file='$current_path/.env'"
+
+if [ "$1" != "$2" ]
+then
+	echo "CHECK FOR ENV FILE UPDATES..."
+	updates_watcher .env.dist "$composer_cmd"
+fi
